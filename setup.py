@@ -34,6 +34,11 @@ from setuptools.command.build_ext import build_ext as _build_ext
 from Cython.Build import cythonize
 
 import numpy as np
+#           "https://www.math.uwaterloo.ca/~bico/qsopt/downloads/codes/mac64/qsopt.a",
+#           "https://www.math.uwaterloo.ca/~bico/qsopt/downloads/codes/mac64/qsopt.h",
+# "/Users/vbloise/Public/qsopt.a",
+# "/Users/vbloise/Public/qsopt.h"
+
 
 QSOPT_LOCATION = {
     "Darwin": {
@@ -42,8 +47,8 @@ QSOPT_LOCATION = {
             "https://www.math.uwaterloo.ca/~bico/qsopt/downloads/codes/m1/qsopt.h",
         ),
         "x86_64": (
-            "https://www.math.uwaterloo.ca/~bico/qsopt/downloads/codes/mac64/qsopt.a",
-            "https://www.math.uwaterloo.ca/~bico/qsopt/downloads/codes/mac64/qsopt.h",
+            "https://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/mac64/qsopt.a",
+            "https://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/mac64/qsopt.h",
         ),
     },
     "Linux": {
@@ -74,6 +79,12 @@ def download_concorde_qsopt():
         print("qsopt is missing, downloading")
         machine = platform.machine()
         qsopt_a_url, qsopt_h_url = QSOPT_LOCATION[platform.system()][machine]
+        # if platform.system() == "Darwin":
+        #     print(qsopt_a_url, qsopt_a_path)
+        #     shutil.copyfile(qsopt_a_url, qsopt_a_path)
+        #     shutil.copyfile(qsopt_h_url, qsopt_h_path)
+        #     #_run("cp", qsopt_h_url + " ./" + qsopt_h_path)
+        # else:
         urlretrieve(qsopt_a_url, qsopt_a_path)
         urlretrieve(qsopt_h_url, qsopt_h_path)
     concorde_src_path = pjoin("build", "concorde.tgz")
@@ -91,10 +102,10 @@ def build_concorde():
         print("building concorde")
         _run("tar xzvf concorde.tgz", "build")
 
-        cflags = "-fPIC -O2 -g"
+        cflags = "-g -O3 -rdynamic"
 
         if platform.system().startswith("Darwin"):
-            flags = "--host=darwin"
+            flags = "--host=i686-darwin-linux-gnu"
         else:
             flags = ""
 
@@ -105,6 +116,7 @@ def build_concorde():
         ).format(cflags=cflags, data=datadir, flags=flags)
 
         _run(cwd, "build/concorde")
+        _run("./fix_config.sh", "build/concorde")
         _run("make", "build/concorde")
 
         shutil.copyfile("build/concorde/concorde.a", "data/concorde.a")
@@ -157,7 +169,7 @@ setup(
     version="0.1.0",
     install_requires=[
         "cython>=0.22.0",
-        "numpy>=1.10.0",
+        "numpy>=1.20.0",
     ],
     packages=find_packages(),
     include_package_data=True,
