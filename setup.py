@@ -56,6 +56,10 @@ QSOPT_LOCATION = {
             "http://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/PIC/qsopt.PIC.a",
             "http://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/PIC/qsopt.h",
         ),
+        "centos": {
+            "http://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/centos/qsopt.a",
+            "http://www.math.uwaterloo.ca/~bico/qsopt/beta/codes/centos/qsopt.h"
+        }
     },
 }
 
@@ -78,6 +82,9 @@ def download_concorde_qsopt():
     if not exists(qsopt_a_path) or not exists(qsopt_h_path):
         print("qsopt is missing, downloading")
         machine = platform.machine()
+        #Special condition to download centos
+        if platform.system()=="Linux" and platform.freedesktop_os_release()['ID']=="centos":
+            machine="centos"
         qsopt_a_url, qsopt_h_url = QSOPT_LOCATION[platform.system()][machine]
         # if platform.system() == "Darwin":
         #     print(qsopt_a_url, qsopt_a_path)

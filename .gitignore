@@ -1,5 +1,6 @@
 .DS_Store
 *.pyc
+*.icloud
 /.idea
 /.idea/modules.xml
 /.idea/pyconcorde.iml
